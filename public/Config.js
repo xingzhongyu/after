@@ -1,0 +1,3 @@
+
+let CONFIG=module.exports;
+CONFIG.TOKENSECRET="SNStREKJCx";
