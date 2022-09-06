@@ -19,7 +19,7 @@ module.exports = app => {
     const randomFns = () => { // 生成6位随机数
         return Math.floor(Math.random() * 1000000)
     }
-    let regEmail =  /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/
+    let regEmail = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/
     //验证邮箱正则
     return async (req, res, next) => {
         let { email } = paramAll(req);
@@ -27,7 +27,7 @@ module.exports = app => {
 
         // console.log(regEmail.test(email));
         if (regEmail.test(email)) {
-            
+
             let code = randomFns()
             transport.sendMail({
                 from: '1846115663@qq.com', // 发件邮箱
@@ -40,7 +40,9 @@ module.exports = app => {
             <p>***该验证码5分钟内有效***</p>` // html 内容
             },
                 function (error, data) {
-                    assert(!error, 500, "发送验证码错误！")
+                    if(error){
+                        next("发送验证码错误")
+                    }
                     transport.close(); // 如果没用，关闭连接池
                 })
             const codeModel = require('./mongo/mongo_connect').codeModel
@@ -51,7 +53,7 @@ module.exports = app => {
                 await codeModel.deleteMany({ email })
             }, 1000 * 60 * 5)
         } else {
-            assert(false, 422, '请输入正确的邮箱格式！')
+            next('请输入正确的邮箱格式' )
         }
         next()
     }

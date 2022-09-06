@@ -44,8 +44,28 @@ function setToken(email,userId){
 
 function verToken(token){
     return new Promise((resolve,reject)=>{
-        let info=jwt.verify(token.split(' ')[1],CONFIG.TOKENSECRET);
-        resolve(info);
+        jwt.verify(token.split(' ')[1],CONFIG.TOKENSECRET,(error,decode)=>{
+            if(error){
+                if(error.name == 'TokenExpiredError'){//token过期
+                    let str = {
+                        err_name: 'token过期',
+                        redirect:'/Login'
+                    }
+                    
+                   reject(str);
+                }else if(error.name == 'JsonWebTokenError'){//无效的token
+                    let str = {
+                        err_name: '无效的token',
+                        redirect:'/Login'
+                    }
+                    
+                   reject(str);
+                }
+            }else{
+                resolve(decode);
+            }
+        });
+       
     })
 };
 module.exports={
